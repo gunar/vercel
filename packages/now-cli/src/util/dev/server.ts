@@ -93,6 +93,10 @@ import {
   HttpHeadersConfig,
   EnvConfigs,
 } from './types';
+import { ProjectEnvTarget, Project } from '../../types';
+
+import Client from '../../util/client';
+import getDecryptedEnvRecords from '../../util/get-decrypted-env-records';
 
 interface FSEvent {
   type: string;
@@ -170,7 +174,6 @@ export default class DevServer {
     this.buildMatches = new Map();
     this.inProgressBuilds = new Map();
     this.devCacheDir = join(getVercelDirectory(cwd), 'cache');
-
     this.getNowConfigPromise = null;
     this.blockingBuildsPromise = null;
     this.updateBuildersPromise = null;
@@ -757,7 +760,11 @@ export default class DevServer {
   /**
    * Launches the `vercel dev` server.
    */
-  async start(...listenSpec: ListenSpec): Promise<void> {
+  async start(
+    client: Client,
+    project: null | Project /* FIX: Better way to get ID/client? */,
+    ...listenSpec: ListenSpec
+  ): Promise<void> {
     if (!fs.existsSync(this.cwd)) {
       throw new Error(`${chalk.bold(this.cwd)} doesn't exist`);
     }
@@ -772,10 +779,28 @@ export default class DevServer {
     // Retrieve the path of the native module
     const nowConfig = await this.getNowConfig(false);
     const nowConfigBuild = nowConfig.build || {};
-    const [runEnv, buildEnv] = await Promise.all([
+
+    const cloudEnvVariables = await getDecryptedEnvRecords(
+      this.output,
+      client,
+      project,
+      4,
+      ProjectEnvTarget.Development
+    );
+
+    const [localEnvVars, localBuildEnvVars] = await Promise.all([
       this.getLocalEnv('.env', nowConfig.env),
       this.getLocalEnv('.env.build', nowConfigBuild.env),
     ]);
+
+    const runEnv = Object.keys(localEnvVars).length
+      ? localEnvVars
+      : cloudEnvVariables;
+    const buildEnv = Object.keys(localBuildEnvVars).length
+      ? localBuildEnvVars
+      : cloudEnvVariables;
+
+    // if local .env/.env.build file exists, don't use cloud variables
     const allEnv = { ...buildEnv, ...runEnv };
     this.envConfigs = { buildEnv, runEnv, allEnv };
 
