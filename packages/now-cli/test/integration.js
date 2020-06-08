@@ -120,6 +120,11 @@ if (!process.env.CI) {
   globalDir = path.join(tmpDir.name, 'com.vercel.tests');
 
   defaultArgs.push('-Q', globalDir);
+
+  if (process.env.VERCEL_SCOPE) {
+    defaultArgs.push('--scope', process.env.VERCEL_SCOPE);
+  }
+
   console.log(
     'No CI detected, adding defaultArgs to avoid polluting user settings',
     defaultArgs
@@ -244,7 +249,7 @@ test.after.always(async () => {
   }
 
   // Make sure the token gets revoked
-  await execa(binaryPath, ['logout', ...defaultArgs]);
+  // await execa(binaryPath, ['logout', ...defaultArgs]);
 
   if (tmpDir) {
     // Remove config directory entirely
@@ -536,13 +541,28 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
     const apiJson = await apiRes.json();
     t.is(apiJson['MY_ENV_VAR'], 'MY_VALUE');
     t.is(apiJson['VERCEL_URL'], host);
+  }
 
-    const homeUrl = `https://${host}`;
-    console.log({ homeUrl });
-    const homeRes = await fetch(homeUrl);
-    t.is(homeRes.status, 200, formatOutput({ stderr, stdout }));
-    const homeJson = await homeRes.json();
-    t.is(homeJson['MY_ENV_VAR'], 'MY_VALUE');
+  async function nowDevAndFetchCloudVars() {
+    const vc = execa(binaryPath, ['dev', ...defaultArgs], {
+      reject: false,
+      cwd: target,
+    });
+
+    await waitForPrompt(vc, chunk => {
+      return chunk.includes('Ready! Available at');
+    });
+    vc.stdin.write('\n');
+
+    const { exitCode, stderr, stdout } = await vc;
+    t.is(exitCode, 0, formatOutput({ stderr, stdout }));
+    const { host } = new URL(stdout);
+    const apiUrl = `https://${host}/api/get-env`;
+    console.log({ apiUrl });
+    const apiRes = await fetch(apiUrl);
+    t.is(apiRes.status, 200, formatOutput({ stderr, stdout }));
+    const apiJson = await apiRes.json();
+    t.is(apiJson['MY_ENV_VAR'], 'MY_VALUE');
     t.is(apiJson['VERCEL_URL'], host);
   }
 
@@ -602,6 +622,11 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
     t.is(exitCode, 0, formatOutput({ stderr, stdout }));
   }
 
+  // await nowEnvRemove();
+  // await nowEnvRemoveWithArgs();
+  // await nowEnvRemoveWithNameOnly();
+  // await nowEnvLsIsEmpty();
+
   await nowDeploy();
   await nowEnvLsIsEmpty();
   await nowEnvAdd();
@@ -610,11 +635,12 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
   await nowEnvLsIncludesVar();
   await nowEnvPull();
   await nowDeployWithVar();
+  fs.unlinkSync(path.join(target, '.env'));
+  await nowDevAndFetchCloudVars();
   await nowEnvRemove();
   await nowEnvRemoveWithArgs();
   await nowEnvRemoveWithNameOnly();
   await nowEnvLsIsEmpty();
-  fs.unlinkSync(path.join(target, '.env'));
 });
 
 test('deploy with metadata containing "=" in the value', async t => {
