@@ -549,21 +549,30 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
       cwd: target,
     });
 
+    let localhost = undefined;
     await waitForPrompt(vc, chunk => {
-      return chunk.includes('Ready! Available at');
+      if (chunk.includes('Ready! Available at')) {
+        localhost = /(https?:[^\s]+)/g.exec(chunk);
+        return true;
+      }
+      return false;
     });
-    vc.stdin.write('\n');
 
-    const { exitCode, stderr, stdout } = await vc;
-    t.is(exitCode, 0, formatOutput({ stderr, stdout }));
-    const { host } = new URL(stdout);
-    const apiUrl = `https://${host}/api/get-env`;
-    console.log({ apiUrl });
+    console.log('API URL: ' + localhost);
+    const { host } = new URL(localhost);
+
+    const apiUrl = `http://${host}/api/get-env`;
     const apiRes = await fetch(apiUrl);
     t.is(apiRes.status, 200, formatOutput({ stderr, stdout }));
+
     const apiJson = await apiRes.json();
     t.is(apiJson['MY_ENV_VAR'], 'MY_VALUE');
     t.is(apiJson['VERCEL_URL'], host);
+
+    vc.process.kill(vc.pid);
+    t.is(exitCode, 0, formatOutput({ stderr, stdout }));
+
+    const { exitCode, stderr, stdout } = await vc;
   }
 
   async function nowEnvRemove() {
