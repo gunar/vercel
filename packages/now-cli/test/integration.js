@@ -249,7 +249,7 @@ test.after.always(async () => {
   }
 
   // Make sure the token gets revoked
-  // await execa(binaryPath, ['logout', ...defaultArgs]);
+  await execa(binaryPath, ['logout', ...defaultArgs]);
 
   if (tmpDir) {
     // Remove config directory entirely
