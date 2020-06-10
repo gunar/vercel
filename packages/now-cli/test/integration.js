@@ -121,10 +121,6 @@ if (!process.env.CI) {
 
   defaultArgs.push('-Q', globalDir);
 
-  if (process.env.VERCEL_SCOPE) {
-    defaultArgs.push('--scope', process.env.VERCEL_SCOPE);
-  }
-
   console.log(
     'No CI detected, adding defaultArgs to avoid polluting user settings',
     defaultArgs
@@ -630,11 +626,6 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
     const { exitCode, stderr, stdout } = await vc;
     t.is(exitCode, 0, formatOutput({ stderr, stdout }));
   }
-
-  // await nowEnvRemove();
-  // await nowEnvRemoveWithArgs();
-  // await nowEnvRemoveWithNameOnly();
-  // await nowEnvLsIsEmpty();
 
   await nowDeploy();
   await nowEnvLsIsEmpty();
