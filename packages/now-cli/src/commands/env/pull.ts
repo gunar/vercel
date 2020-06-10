@@ -59,14 +59,16 @@ export default async function pull(
   );
   const pullStamp = stamp();
 
-  const records: Env = await withSpinner('Downloading', () =>
-    getDecryptedEnvRecords(
-      output,
-      client,
-      project,
-      4,
-      ProjectEnvTarget.Development
-    )
+  const records: Env = await withSpinner(
+    'Downloading',
+    async () =>
+      await getDecryptedEnvRecords(
+        output,
+        client,
+        project,
+        4,
+        ProjectEnvTarget.Development
+      )
   );
 
   if (!records) {
