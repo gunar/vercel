@@ -245,7 +245,7 @@ test.after.always(async () => {
   }
 
   // Make sure the token gets revoked
-  await execa(binaryPath, ['logout', ...defaultArgs]);
+  // await execa(binaryPath, ['logout', ...defaultArgs]);
 
   if (tmpDir) {
     // Remove config directory entirely
@@ -566,6 +566,8 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
 
     const apiUrl = `${localhost[0]}/api/get-env`;
     const apiRes = await fetch(apiUrl);
+
+    console.log(await apiRes.json());
     t.is(apiRes.status, 200);
 
     const apiJson = await apiRes.json();
