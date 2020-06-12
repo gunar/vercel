@@ -562,12 +562,9 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
       return false;
     });
 
-    console.log('API URL: ' + localhost[0]);
-
     const apiUrl = `${localhost[0]}`;
     const apiRes = await fetch(apiUrl);
 
-    console.log(await apiRes.json());
     t.is(apiRes.status, 200);
 
     const apiJson = await apiRes.json();
