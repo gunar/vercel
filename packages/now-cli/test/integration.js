@@ -565,7 +565,7 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
     console.log('API URL: ' + localhost[0]);
     const { host } = new URL(localhost[0]);
 
-    const apiUrl = `http://${host}/api/get-env`;
+    const apiUrl = `${localhost[0]}/api/get-env`;
     const apiRes = await fetch(apiUrl);
     t.is(apiRes.status, 200);
 
