@@ -245,7 +245,7 @@ test.after.always(async () => {
     // Stop mock server
     loginApiServer.close();
   }
-  
+
   // Make sure the token gets revoked unless it's passed in via environment
   if (!process.env.VERCEL_TOKEN) {
     await execa(binaryPath, ['logout', ...defaultArgs]);
