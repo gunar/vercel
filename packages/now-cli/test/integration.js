@@ -537,6 +537,14 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
     const apiJson = await apiRes.json();
     t.is(apiJson['MY_ENV_VAR'], 'MY_VALUE');
     t.is(apiJson['VERCEL_URL'], host);
+
+    const homeUrl = `https://${host}`;
+    console.log({ homeUrl });
+    const homeRes = await fetch(homeUrl);
+    t.is(homeRes.status, 200, formatOutput({ stderr, stdout }));
+    const homeJson = await homeRes.json();
+    t.is(homeJson['MY_ENV_VAR'], 'MY_VALUE');
+    t.is(apiJson['VERCEL_URL'], host);
   }
 
   async function nowDevAndFetchCloudVars() {
