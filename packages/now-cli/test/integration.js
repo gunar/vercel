@@ -578,7 +578,7 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
     const homeRes = await fetch(homeUrl);
     const homeJson = await homeRes.json();
     t.is(homeJson['MY_ENV_VAR'], 'MY_VALUE');
-    t.is(homeJson['VERCEL_URL'], localhost[0]);
+    t.is(homeJson['VERCEL_URL'], '');
 
     vc.kill('SIGTERM', { forceKillAfterTimeout: 2000 });
 
