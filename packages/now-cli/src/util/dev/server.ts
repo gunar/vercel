@@ -800,7 +800,6 @@ export default class DevServer {
       allEnv = runEnv = buildEnv = decryptedEnvRecrds;
     }
 
-    // if local .env/.env.build file exists, don't use cloud variables
     this.envConfigs = { buildEnv, runEnv, allEnv };
 
     const opts = { output: this.output, isBuilds: true };
