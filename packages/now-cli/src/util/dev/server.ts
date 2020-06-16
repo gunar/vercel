@@ -247,6 +247,7 @@ export default class DevServer {
       this.getLocalEnv('.env.build', nowConfigBuild.env),
     ]);
     const allEnv = { ...buildEnv, ...runEnv };
+
     this.envConfigs = { buildEnv, runEnv, allEnv };
 
     // Update the build matches in case an entrypoint was created or deleted
@@ -780,7 +781,7 @@ export default class DevServer {
     const nowConfig = await this.getNowConfig(false);
     const nowConfigBuild = nowConfig.build || {};
 
-    const [runEnv, buildEnv] = await Promise.all([
+    let [runEnv, buildEnv] = await Promise.all([
       this.getLocalEnv('.env', nowConfig.env),
       this.getLocalEnv('.env.build', nowConfigBuild.env),
     ]);
@@ -789,13 +790,14 @@ export default class DevServer {
 
     // if local .env/.env.build don't exist, use cloud variables
     if (Object.keys(allEnv).length === 0) {
-      allEnv = await getDecryptedEnvRecords(
+      const decryptedEnvRecrds = await getDecryptedEnvRecords(
         this.output,
         client,
         project,
         4,
         ProjectEnvTarget.Development
       );
+      allEnv = runEnv = buildEnv = decryptedEnvRecrds;
     }
 
     // if local .env/.env.build file exists, don't use cloud variables
@@ -1910,7 +1912,6 @@ export default class DevServer {
     );
 
     const port = await getPort();
-
     const env: Env = {
       // Because of child process 'pipe' below, isTTY will be false.
       // Most frameworks use `chalk`/`supports-color` so we enable it anyway.

@@ -29,7 +29,7 @@ export interface DevServerOptions {
 
 export interface EnvConfigs {
   /**
-   * environment variables from `.env.build` file (deprecated)
+   * environment variables from `.env.build` file
    */
   buildEnv: Env;
 

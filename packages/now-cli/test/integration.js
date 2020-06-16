@@ -535,7 +535,6 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
     const { host } = new URL(stdout);
 
     const apiUrl = `https://${host}/api/get-env`;
-    console.log({ apiUrl });
     const apiRes = await fetch(apiUrl);
     t.is(apiRes.status, 200, formatOutput({ stderr, stdout }));
     const apiJson = await apiRes.json();
@@ -543,7 +542,6 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
     t.is(apiJson['VERCEL_URL'], host);
 
     const homeUrl = `https://${host}`;
-    console.log({ homeUrl });
     const homeRes = await fetch(homeUrl);
     t.is(homeRes.status, 200, formatOutput({ stderr, stdout }));
     const homeJson = await homeRes.json();
