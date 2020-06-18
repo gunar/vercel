@@ -17,7 +17,7 @@ export default async function getDecryptedEnvRecords(
     return {};
   }
 
-  const envs = await getEnvVariables(output, client, project.id, 4, target);
+  const envs = await getEnvVariables(output, client, project.id, apiVersion, target);
   const decryptedValues = await Promise.all(
     envs.map(async env => {
       try {
