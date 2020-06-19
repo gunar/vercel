@@ -66,7 +66,6 @@ export default async function pull(
         output,
         client,
         project,
-        4,
         ProjectEnvTarget.Development
       )
   );

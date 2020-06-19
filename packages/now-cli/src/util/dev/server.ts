@@ -794,7 +794,6 @@ export default class DevServer {
         this.output,
         client,
         project,
-        4,
         ProjectEnvTarget.Development
       );
       allEnv = runEnv = buildEnv = decryptedEnvRecrds;
