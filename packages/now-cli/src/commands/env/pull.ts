@@ -80,8 +80,8 @@ export default async function pull(
   }
 
   const contents =
-    Object.keys(records)
-      .map(key => `${key}="${escapeValue(records[key]!)}"`)
+    Object.entries(records)
+      .map(([key, value]) => `${key}="${escapeValue(value)}"`)
       .join('\n') + '\n';
 
   await writeFile(fullPath, contents, 'utf8');
