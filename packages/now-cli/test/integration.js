@@ -571,13 +571,16 @@ test('Deploy `api-env` fixture and test `vercel env` command', async t => {
       reject: false,
       cwd: target,
     });
-
-    let localhost = undefined;
+    console.log('nowDevWithEnv()!!!');
 
     await waitForPrompt(vc, chunk => {
+      console.log('Chunk:');
+      console.log(chunk);
       return chunk.includes('Loaded env from .env');
     });
+    console.log('Past 1st prompt');
 
+    let localhost = undefined;
     await waitForPrompt(vc, chunk => {
       if (chunk.includes('Ready! Available at')) {
         localhost = /(https?:[^\s]+)/g.exec(chunk);

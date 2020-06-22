@@ -97,8 +97,10 @@ export default async function pull(
   return 0;
 }
 
-function escapeValue(value: string) {
+function escapeValue(value: string | undefined) {
   return value
-    .replace(new RegExp('\n', 'g'), '\\n') // combine newlines (unix) into one line
-    .replace(new RegExp('\r', 'g'), '\\r'); // combine newlines (windows) into one line
+    ? value
+        .replace(new RegExp('\n', 'g'), '\\n') // combine newlines (unix) into one line
+        .replace(new RegExp('\r', 'g'), '\\r') // combine newlines (windows) into one line
+    : '';
 }
