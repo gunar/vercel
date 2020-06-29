@@ -59,7 +59,7 @@ import { BuildOptions, createLambda } from '@vercel/build-utils';
 export async function build(options: BuildOptions) {
   // Build the code here…
 
-  const lambda = createLambda(/* … */);
+  const lambda = await createLambda(/* … */);
   return {
     output: lambda,
     watch: [
